@@ -1,0 +1,13 @@
+class LdifParser
+  def self.parse_file: (String ldif_path, only: Array[String], except: Array[String]) -> Array[Hash[Symbol, (String | Array[String])]]
+  def self.parse: (String str, only: Array[String], except: Array[String]) -> Array[Hash[Symbol, (String | Array[String])]]
+  def self.included_pattern: (Array[String] patterns) -> Array[String]
+  def self.excluded_pattern: (Array[String] patterns) -> Array[String]
+  attr_reader included_patterns: Array[String]
+  attr_reader excluded_patterns: Array[String]
+
+  def initialize: (String str) -> void
+  def parse!: -> Array[Hash[Symbol, (String | Array[String])]]
+  def str_parts: -> Array[String]
+  def line_has_to_be_excluded?: (String line) -> (bool)
+end

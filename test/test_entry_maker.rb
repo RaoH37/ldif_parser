@@ -20,6 +20,6 @@ class TestEntryMaker < Minitest::Test
 
   def test_multi_lines
     entry = LdifParser::EntryMaker.call(LDIF_ENTRY_STR.dup)
-    assert entry[:csrfTokenData].length == 205
+    assert entry[:userApiKey].length == 205
   end
 end

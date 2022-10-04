@@ -1,0 +1,11 @@
+class LdifParser
+  class EntryMaker
+    def self.call: (String str) -> Hash[Symbol, (String | Array[String])]
+
+    def initialize: (String str) -> void
+    def make: -> Hash[Symbol, (String | Array[String])]
+    def lines_decoded: -> Array[Array[String]]
+    def line_decoder: (String line) -> Array[String]
+    def lines: -> Array[String]
+  end
+end
