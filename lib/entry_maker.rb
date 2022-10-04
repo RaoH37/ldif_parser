@@ -11,6 +11,10 @@ class LdifParser
       def call(str)
         new(str).make
       end
+
+      def call_minimized(str)
+        new(str).make_minimized
+      end
     end
 
     def initialize(str)
@@ -20,15 +24,25 @@ class LdifParser
     end
 
     def make
-      lines_decoded.each_with_object({}) do |(k, v), h|
-        (h[k] ||= [])
-        h[k].push(v)
-      end.transform_values do |v|
+      hash = lines_decoded_to_h
+      hash.default = []
+      hash
+    end
+
+    def make_minimized
+      make.transform_values do |v|
         v.length == 1 ? v.first : v
       end
     end
 
     private
+
+    def lines_decoded_to_h
+      lines_decoded.each_with_object({}) do |(k, v), h|
+        (h[k] ||= [])
+        h[k].push(v)
+      end
+    end
 
     def lines_decoded
       lines.map do |line|

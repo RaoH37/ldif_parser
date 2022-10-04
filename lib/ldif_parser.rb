@@ -7,14 +7,15 @@ class LdifParser
   NEW_LDIF_OBJECT_PATTERN = 'dn:'
 
   class << self
-    def parse_file(ldif_path, only: [], except: [])
-      parse(IO.read(ldif_path), only: only, except: except)
+    def parse_file(ldif_path, minimized: false, only: [], except: [])
+      parse(IO.read(ldif_path), minimized: minimized, only: only, except: except)
     end
 
-    def parse(str, only: [], except: [])
+    def parse(str, minimized: false, only: [], except: [])
       included_pattern(only)
       excluded_pattern(except)
-      new(str).parse!
+      parser = new(str)
+      minimized ? parser.parse_minimized! : parser.parse!
     end
 
     def included_pattern(patterns)
@@ -35,6 +36,12 @@ class LdifParser
   def parse!
     str_parts.map do |str|
       EntryMaker.call(str)
+    end
+  end
+
+  def parse_minimized!
+    str_parts.map do |str|
+      EntryMaker.call_minimized(str)
     end
   end
 
