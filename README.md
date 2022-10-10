@@ -5,7 +5,7 @@
 require 'ldif_parser'
 
 ldif_path = '/tmp/ldap.bak'
-result = LdifParser.parse_file(ldif_path, only: %w[displayName zimbraMailQuota mail])
+result = LdifParser.parse_file(ldif_path, only: %w[displayName givenName sn mail])
 
 result.each do |res|
   p res
