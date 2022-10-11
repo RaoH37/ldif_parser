@@ -39,9 +39,13 @@ class LdifParser
 
     def lines_decoded_to_h
       lines_decoded.each_with_object({}) do |(k, v), h|
-        (h[k] ||= [])
+        (init_hash(h, k))
         h[k].push(v)
       end
+    end
+
+    def init_hash(h, k)
+      h[k] ||= []
     end
 
     def lines_decoded
