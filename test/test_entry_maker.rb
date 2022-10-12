@@ -34,6 +34,21 @@ class TestEntryMaker < Minitest::Test
     assert entry[:foo].empty?
   end
 
+  def test_dn_is_a_string
+    entry = LdifParser::EntryMaker.call(LDIF_ENTRY_STR.dup)
+    assert entry.dn.is_a?(String)
+    refute entry.dn.empty?
+  end
+
+  def test_insensitive_key
+    entry = LdifParser::EntryMaker.call(LDIF_ENTRY_STR.dup)
+    object_ids = [entry[:uid].object_id, entry['uid'].object_id, entry['UID'].object_id]
+    object_ids.compact!
+    assert object_ids.length == 3
+    object_ids.uniq!
+    assert object_ids.length == 1
+  end
+
   def test_minimized
     entry = LdifParser::EntryMaker.call_minimized(LDIF_ENTRY_STR.dup)
     assert entry[:uuid].is_a?(String)

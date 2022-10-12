@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'hash_insensitive'
 require 'base64'
 
 class LdifParser
@@ -25,6 +26,7 @@ class LdifParser
 
     def make
       hash = lines_decoded_to_h
+      hash.extend(HashInsensitive)
       hash.default = []
       hash
     end
