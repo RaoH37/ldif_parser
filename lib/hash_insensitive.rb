@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module HashInsensitive
   def dn
     @dn ||= self['dn'].first
   end
 
   def insensitive_origin_keys
-    self.keys.select { |key| key.respond_to?(:to_s) }
+    keys.select { |key| key.respond_to?(:to_s) }
   end
 
   def insensitive_keys

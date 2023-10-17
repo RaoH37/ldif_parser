@@ -5,6 +5,8 @@ require_relative 'version'
 
 class LdifParser
   NEW_LDIF_OBJECT_PATTERN = 'dn'
+  SPACE = ' '
+  DOUBLE_POINT = ':'
 
   class << self
     def parse_file(ldif_path, minimized: false, only: [], except: [])
@@ -76,13 +78,13 @@ class LdifParser
   end
 
   def new_ldif_object?(line_key, str, line)
-    line_key == NEW_LDIF_OBJECT_PATTERN && !str.empty? && !line.start_with?(' ')
+    line_key == NEW_LDIF_OBJECT_PATTERN && !str.empty? && !line.start_with?(SPACE)
   end
 
   def get_line_key(line, previous_key)
-    return previous_key if line.start_with?(' ')
+    return previous_key if line.start_with?(SPACE)
 
-    line.split(':').first&.downcase || previous_key
+    line.split(DOUBLE_POINT).first&.downcase || previous_key
   end
 
   def line_has_to_be_excluded?(line_key)

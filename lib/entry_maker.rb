@@ -41,7 +41,7 @@ class LdifParser
 
     def lines_decoded_to_h
       lines_decoded.each_with_object({}) do |(k, v), h|
-        (init_hash(h, k))
+        init_hash(h, k)
         h[k].push(v)
       end
     end
@@ -59,7 +59,7 @@ class LdifParser
     def line_decoder(line)
       parts = line.scan(R_LINE_SPLIT).first
       parts[0] = parts[0].to_sym
-      parts[2] = Base64.decode64(parts[2]).force_encoding('UTF-8') if BASE64_SEPARATOR == parts[1]
+      parts[2] = Base64.decode64(parts[2]).force_encoding('UTF-8') if parts[1] == BASE64_SEPARATOR
       parts.delete_at(1)
       parts
     end
