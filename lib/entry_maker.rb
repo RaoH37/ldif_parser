@@ -2,7 +2,6 @@
 
 require_relative 'hash_insensitive'
 require 'base64'
-require 'set'
 
 class LdifParser
   class EntryMaker
@@ -48,7 +47,7 @@ class LdifParser
     end
 
     def init_hash(h, k)
-      h[k] ||= Set.new
+      h[k] ||= []
     end
 
     def lines_decoded
