@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'test_helper'
-require 'mocha/minitest'
 
 class TestLdifParser < Minitest::Test
   def test_has_version_number

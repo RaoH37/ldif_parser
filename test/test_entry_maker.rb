@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'test_helper'
-require 'mocha/minitest'
 
 class TestEntryMaker < Minitest::Test
   def test_is_a_hash

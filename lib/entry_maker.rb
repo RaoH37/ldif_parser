@@ -2,10 +2,11 @@
 
 require_relative 'hash_insensitive'
 require 'base64'
+require 'set'
 
 class LdifParser
   class EntryMaker
-    R_LINE_SPLIT = /(\w+)(:+)\s*(.*)/.freeze
+    R_LINE_SPLIT = /(\w+)(:+)\s*(.*)/
     BASE64_SEPARATOR = '::'
 
     class << self
@@ -42,12 +43,12 @@ class LdifParser
     def lines_decoded_to_h
       lines_decoded.each_with_object({}) do |(k, v), h|
         init_hash(h, k)
-        h[k].push(v)
+        h[k] << v
       end
     end
 
     def init_hash(h, k)
-      h[k] ||= []
+      h[k] ||= Set.new
     end
 
     def lines_decoded

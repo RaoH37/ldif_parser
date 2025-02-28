@@ -1,15 +1,10 @@
 # frozen_string_literal: true
 
 class LdifParser
-  def self.gem_version
-    Gem::Version.new VERSION::STRING
-  end
-
-  module VERSION
-    MAJOR = 0
-    MINOR = 5
-    TINY  = 0
-
-    STRING = [MAJOR, MINOR, TINY].compact.join('.')
+  class << self
+    def version
+      File.read(File.expand_path('../VERSION', __dir__)).strip
+    end
+    alias gem_version version
   end
 end

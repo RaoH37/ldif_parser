@@ -5,8 +5,8 @@ class LdifParser
 
     def initialize: (String str) -> void
     def make: -> Hash[Symbol, Array[String]]
-    def make_minimized: -> Hash[Symbol, String | Array[String]]
-    def lines_decoded_to_h: -> Hash[Symbol, Array[String]]
+    def make_minimized: -> Hash[Symbol, String | Set[String]]
+    def lines_decoded_to_h: -> Hash[Symbol, Set[String]]
     def lines_decoded: -> Array[Array[String]]
     def line_decoder: (String line) -> Array[String]
     def lines: -> Array[String]

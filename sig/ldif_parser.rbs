@@ -3,6 +3,9 @@ class LdifParser
   def self.parse: (String str, minimized: bool, only: Array[String], except: Array[String]) -> Array[Hash[Symbol, (String | Array[String])]]
   def self.included_pattern: (Array[String] patterns) -> Array[String]
   def self.excluded_pattern: (Array[String] patterns) -> Array[String]
+
+  def self.version: -> String
+
   attr_reader included_patterns: Array[String]
   attr_reader excluded_patterns: Array[String]
 
