@@ -57,3 +57,4 @@ build-iPhoneSimulator/
 .idea
 scripts
 /*.lock
+/test/speed.rb
