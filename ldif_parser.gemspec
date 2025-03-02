@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license = 'GPL-3.0-only'
 
   spec.required_ruby_version = '>= 3.1'
-  s.required_rubygems_version = '>= 1.8.11'
+  spec.required_rubygems_version = '>= 1.8.11'
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = spec.homepage
