@@ -1,95 +1,94 @@
 # frozen_string_literal: true
 
-require_relative 'entry_maker'
+require_relative 'entries_maker'
 require_relative 'version'
+require 'stringio'
 
 class LdifParser
-  NEW_LDIF_OBJECT_PATTERN = 'dn'
-  SPACE = ' '
-  DOUBLE_POINT = ':'
-
   class << self
-    def parse_file(ldif_path, minimized: false, only: [], except: [])
-      parse(IO.read(ldif_path), minimized: minimized, only: only, except: except)
-    end
+    def open(path, minimized: false, only: [], except: [])
+      options = {
+        minimized: minimized,
+        only_regexp: build_regexp(only),
+        except_regexp: build_regexp(except)
+      }.freeze
 
-    def parse(str, minimized: false, only: [], except: [])
-      included_pattern(only)
-      excluded_pattern(except)
-      parser = new(str)
-      minimized ? parser.parse_minimized! : parser.parse!
-    end
+      input = File.open(File.expand_path(path))
 
-    def included_pattern(patterns)
-      @included_patterns = patterns.map(&:downcase)
-    end
+      new(input, options).tap do |parser|
+        if block_given?
+          yield parser
 
-    def excluded_pattern(patterns)
-      @excluded_patterns = patterns.map(&:downcase)
-    end
-
-    attr_reader :included_patterns, :excluded_patterns
-  end
-
-  def initialize(str)
-    @str = str
-  end
-
-  def parse!
-    str_parts.map do |str|
-      EntryMaker.call(str)
-    end
-  end
-
-  def parse_minimized!
-    str_parts.map do |str|
-      EntryMaker.call_minimized(str)
-    end
-  end
-
-  def str_parts
-    parts = []
-    str = ''.dup
-    previous_key = nil
-
-    @str.each_line do |line|
-      line_key = get_line_key(line, previous_key)
-      next if line_key.nil?
-
-      if line_has_to_be_excluded?(line_key)
-        previous_key = line_key
-        next
+          parser.close
+        else
+          ObjectSpace.define_finalizer parser, finalizer(input)
+        end
       end
-
-      if new_ldif_object?(line_key, str, line)
-        parts << str
-        str = ''.dup
-      end
-
-      str << line
-      previous_key = line_key
     end
 
-    parts << str
+    private
 
-    @str = nil
+    def build_regexp(keys)
+      return nil if keys.empty?
 
-    parts
+      or_map = keys.map { |key| "#{key}:" }
+      Regexp.new("^(#{or_map.join('|')})", Regexp::IGNORECASE)
+    end
+
+    def finalizer(io)
+      proc { io.close }
+    end
   end
 
-  def new_ldif_object?(line_key, str, line)
-    line_key == NEW_LDIF_OBJECT_PATTERN && !str.empty? && !line.start_with?(SPACE)
+  attr_reader :input
+
+  def initialize(what, options = {})
+    @input = if what.respond_to? :to_io
+               what.to_io
+             elsif what.is_a? String
+               StringIO.new(what)
+             else
+               raise ArgumentError, 'I do not know what to do.'
+             end
+
+    @options = options
   end
 
-  def get_line_key(line, previous_key)
-    return previous_key if line.start_with?(SPACE)
-
-    line.split(DOUBLE_POINT).first&.downcase || previous_key
+  def close
+    @input.close
   end
 
-  def line_has_to_be_excluded?(line_key)
-    return false if line_key == NEW_LDIF_OBJECT_PATTERN
+  def lock
+    @input.flock File::LOCK_SH if @input.respond_to? :flock
 
-    self.class.excluded_patterns.include?(line_key) || (!self.class.included_patterns.empty? && !self.class.included_patterns.include?(line_key))
+    return unless block_given?
+
+    begin
+      yield self
+    ensure
+      unlock
+    end
+  end
+
+  def unlock
+    return unless @input.respond_to? :flock
+
+    @input.flock File::LOCK_UN
+  end
+
+  def each(&block)
+    @input.seek 0
+
+    lock do
+      each_no_lock(&block)
+    end
+  end
+
+  private
+
+  def each_no_lock
+    while (entry = EntriesMaker.parse(@input, @options))
+      yield entry
+    end
   end
 end
