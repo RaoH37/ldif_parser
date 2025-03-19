@@ -20,7 +20,7 @@ class LdifParser
 
     def make
       hash = lines_decoded_to_h
-      hash[:dn] = hash[:dn].first
+      hash[:dn] = hash[:dn]&.first
 
       if @minimized
         hash.transform_values! do |v|
